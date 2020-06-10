@@ -15,6 +15,9 @@
 ## 搜索完全匹配的关键字
 为字词或短语加上引号。如："最高的建筑"
 
+## 通配符
+在搜索关键词中可以加入 * 号进行模糊搜索，可以配合引号。如："搜索*擎"
+
 ## 在某个数字范围内执行搜索
 在两个数字之间加上 ..。如：相机 $50..$100
 
@@ -29,3 +32,26 @@
 
 ## 查看网站的 Google 缓存版本
 在网址前加上“cache:”。例如：cache:example.com
+
+## 搜索近似的词
+在搜索关键词前加上 ~。例如：~foreach
+
+## 通过其他操作符调整搜索
+| 算符          | 用途                                                   | 用法                                    |
+| :------------ | :---------------------------------------------------- | :-------------------------------------- |
+| allinanchor:  | 限制搜索的词语是网页中链接内包含的关键词（可使用多个关键词）| allinanchor:keyword1 keyword2          |
+| allintext:    | 限制搜索的词语是网页内文包含的关键词（可使用多个关键词）    | allintext:keyword1 keyword2            |
+| allintitle:   | 限制搜索的词语是网页标题中包含的关键词（可使用多个关键词）  | allintitle:keyword1 keyword2           |
+| allinurl:	    | 限制搜索的词语是网页网址中包含的关键词（可使用多个关键词）  | inurl:keyword1 keyword2                |
+| filetype:     | 限制所搜索的文件一个特定的格式                           | filetype:pdf                           |
+| inanchor:     | 限制搜索的词语是网页中链接内包含的关键词                  | inanchor:keyword                       |
+| intext:       | 限制搜索的词语是网页内文包含的关键词                      | intext:keyword                         |
+| intitle:      | 限制搜索的词语是网页标题中包含的关键词                    | intitle:keyword                        |
+| inurl:        | 限制搜索的网页的地址                                    | inurl:keyword                          |
+| site:         | 限制所进行的搜索在指定的域名或网站内                      | site:domain                            |
+
+#### 参考：
+[Google 搜索帮助](https://support.google.com/websearch/answer/2466433)  
+[知乎：如何用好谷歌等搜索引擎？](https://www.zhihu.com/question/20161362)  
+[十大高明的Google搜索技巧](https://www.williamlong.info/archives/728.html)  
+[20 Google Search Tips to Use Google More Efficiently](https://www.lifehack.org/articles/technology/20-tips-use-google-search-efficiently.html)  
