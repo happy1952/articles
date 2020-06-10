@@ -102,6 +102,6 @@ systemctl is-enabled supervisord
 ```
 
 ### 参考：
-[https://thief.one/2018/06/01/1/](https://thief.one/2018/06/01/1/)  
-[https://juejin.im/entry/5cbde1335188250a7f630c2a](https://juejin.im/entry/5cbde1335188250a7f630c2a)  
-[https://www.jianshu.com/p/03619bf7d7f5](https://www.jianshu.com/p/03619bf7d7f5)
+[Supervisord管理进程实践](https://thief.one/2018/06/01/1/)  
+[Python supervisor 强大的进程管理工具](https://juejin.im/entry/5cbde1335188250a7f630c2a)  
+[Supervisor进程管理&开机自启](https://www.jianshu.com/p/03619bf7d7f5)
