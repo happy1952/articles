@@ -15,7 +15,7 @@
 ## 搜索完全匹配的关键字
 为字词或短语加上引号。如："最高的建筑"
 
-## 通配符
+## 使用星号通配符
 在搜索关键词中可以加入 * 号进行模糊搜索，可以配合引号。如："搜索*擎"
 
 ## 在某个数字范围内执行搜索
@@ -43,12 +43,13 @@
 | allintext:    | 限制搜索的词语是网页内文包含的关键词（可使用多个关键词）    | allintext:keyword1 keyword2            |
 | allintitle:   | 限制搜索的词语是网页标题中包含的关键词（可使用多个关键词）  | allintitle:keyword1 keyword2           |
 | allinurl:	    | 限制搜索的词语是网页网址中包含的关键词（可使用多个关键词）  | inurl:keyword1 keyword2                |
-| filetype:     | 限制所搜索的文件一个特定的格式                           | filetype:pdf                           |
+| filetype:     | 限制所搜索的文件一个特定的格式                           | *个人简历*filetype:pdf                  |
 | inanchor:     | 限制搜索的词语是网页中链接内包含的关键词                  | inanchor:keyword                       |
 | intext:       | 限制搜索的词语是网页内文包含的关键词                      | intext:keyword                         |
-| intitle:      | 限制搜索的词语是网页标题中包含的关键词                    | intitle:keyword                        |
-| inurl:        | 限制搜索的网页的地址                                    | inurl:keyword                          |
-| site:         | 限制所进行的搜索在指定的域名或网站内                      | site:domain                            |
+| intitle:      | 限制搜索的词语是网页标题中包含的关键词                    | intitle:后台登录                        |
+| inurl:        | 限制搜索的网页的地址                                    | inurl:upload                           |
+| site:         | 限制所进行的搜索在指定的域名或网站内                      | *130*site:example.com                  |
+| link:         | 搜索链接到指定链接的页面                                 | link:pan.baidu.com                     |
 
 #### 参考：
 [Google 搜索帮助](https://support.google.com/websearch/answer/2466433)  
