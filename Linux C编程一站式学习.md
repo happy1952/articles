@@ -830,6 +830,15 @@ s.end.x = 3.0;
 ```c
 /* 由4个int型元素组成的数组count */
 int count[4];
+
+/* 数组可以像结构体一样初始化 */
+int count[4] = {3, 2,};
+
+/* 如果定义数组的同时初始化它，也可以不指定数组长度 */
+int count[] = {3, 2, 1,};
+
+/* 利用C99的新特性成员初始化（Memberwise Initialization） */
+int count[4] = {[2] = 3};
 ```
 和结构体成员类似，数组count的4个元素的存储空间也是相邻的。结构体成员可以是基本类型，也可以是复合数据类型，数组中的元素也是如此。根据组合规则，我们可以定义一个由4个结构体组成的数组：
 ```c
@@ -870,10 +879,153 @@ for (int i = 0; i < 4; i++) {
     printf("s.count[%d] = %d\n", i, s.count[i]);
 }
 ```
+数组和结构体虽然有很多相似之处，但也有一个显著的不同：数组不能相互赋值或初始化。例如下面这样是错误的：
+```c
+int a[5] = {4, 3, 2, 1};
+int b[5] = a;
+
+/* 相互赋值也是错的 */
+b = a;
+```
+
+**注意：数组类型做右值使用时，自动转换成指向数组首元素的指针。**
 
 ### 2. 数组的应用实例：统计随机数
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#define N 20
+
+int a[N];
+
+void gen_random(int upper_bound)
+{
+	int i;
+	for (i = 0; i < N; i++) {
+		a[i] = rand() % upper_bound;
+	}
+}
+
+void print_random()
+{
+	int i;
+	for (i = 0; i < N; i++) {
+		printf("%d ", a[i]);
+	}
+	printf("\n");
+}
+
+int howmany(int value)
+{
+	int count = 0, i;
+	for (i = 0; i < N; i++) {
+		if (a[i] == value) {
+			++count;
+		}
+	}
+	return count;
+}
+
+int main(void)
+{
+	int i;
+	gen_random(10);
+	// print_random();
+	printf("value\thow many\n");
+	for (i = 0; i < 10; i++) {
+		printf("%d\t%d\n", i, howmany(i));
+	}
+	return 0;
+}
+```
+
 ### 3. 数组的应用实例：直方图
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#define N 100
+
+int a[N];
+
+void gen_random(int);
+int howmany(int);
+
+int main(void)
+{
+	int x, y, i, j = 0, histogram[10] = {0};
+	gen_random(10);
+
+	for (i = 0; i < N; i++) {
+		histogram[a[i]]++;
+	}
+
+    for (i = 0; i < 10; i++) {
+		if (histogram[i] > j) {
+			j = histogram[i];
+		}
+    }
+
+	printf("0 1 2 3 4 5 6 7 8 9 \n");
+	for (x = 0; x < j; x++) {
+		for (y = 0; y < 10; y++) {
+			if (histogram[y] > 0) {
+				printf("* ");
+				histogram[y]--;
+			} else {
+				printf("  ");
+			}
+		}
+		printf("\n");
+	}
+	return 0;
+}
+
+int main_bak(void)
+{
+	int i, histogram[10] = {0};
+	gen_random(10);
+
+	for (i = 0; i < N; i++) {
+		histogram[a[i]]++;
+	}
+
+	for (i = 0; i < 10; i++) {
+		printf("%d ", i );
+		if (histogram[i] > 0) {
+			int j;
+			for (j = 0; j < histogram[i]; j++) {
+				printf("*");
+			}
+		}
+		printf("\n");
+	}
+	return 0;
+}
+
+void gen_random(int upper_bound)
+{
+	int i;
+	srand(time(NULL));
+	for (i = 0; i < N; i++) {
+		a[i] = rand() % upper_bound;
+	}
+}
+
+int howmany(int value)
+{
+	int count = 0, i;
+	for (i = 0; i < N; i++) {
+		if (a[i] == value) {
+			++count;
+		}
+	}
+	return count;
+}
+```
 ### 4. 字符串
+
+
 ### 5. 多维数组
 
 ## C语言本质（Bottom Up）
