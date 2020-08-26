@@ -900,42 +900,42 @@ int a[N];
 
 void gen_random(int upper_bound)
 {
-	int i;
-	for (i = 0; i < N; i++) {
-		a[i] = rand() % upper_bound;
-	}
+    int i;
+    for (i = 0; i < N; i++) {
+        a[i] = rand() % upper_bound;
+    }
 }
 
 void print_random()
 {
-	int i;
-	for (i = 0; i < N; i++) {
-		printf("%d ", a[i]);
-	}
-	printf("\n");
+    int i;
+    for (i = 0; i < N; i++) {
+        printf("%d ", a[i]);
+    }
+    printf("\n");
 }
 
 int howmany(int value)
 {
-	int count = 0, i;
-	for (i = 0; i < N; i++) {
-		if (a[i] == value) {
-			++count;
-		}
-	}
-	return count;
+    int count = 0, i;
+    for (i = 0; i < N; i++) {
+        if (a[i] == value) {
+            ++count;
+        }
+    }
+    return count;
 }
 
 int main(void)
 {
-	int i;
-	gen_random(10);
-	// print_random();
-	printf("value\thow many\n");
-	for (i = 0; i < 10; i++) {
-		printf("%d\t%d\n", i, howmany(i));
-	}
-	return 0;
+    int i;
+    gen_random(10);
+    /* print_random(); */
+    printf("value\thow many\n");
+    for (i = 0; i < 10; i++) {
+        printf("%d\t%d\n", i, howmany(i));
+    }
+    return 0;
 }
 ```
 
@@ -950,77 +950,85 @@ int a[N];
 
 void gen_random(int);
 int howmany(int);
+void row_view(void);
+void column_view(void);
 
 int main(void)
 {
-	int x, y, i, j = 0, histogram[10] = {0};
-	gen_random(10);
-
-	for (i = 0; i < N; i++) {
-		histogram[a[i]]++;
-	}
-
-    for (i = 0; i < 10; i++) {
-		if (histogram[i] > j) {
-			j = histogram[i];
-		}
-    }
-
-	printf("0 1 2 3 4 5 6 7 8 9 \n");
-	for (x = 0; x < j; x++) {
-		for (y = 0; y < 10; y++) {
-			if (histogram[y] > 0) {
-				printf("* ");
-				histogram[y]--;
-			} else {
-				printf("  ");
-			}
-		}
-		printf("\n");
-	}
-	return 0;
+	row_view();
+	printf("\n");
+	column_view();
+    return 0;
 }
 
-int main_bak(void)
+void column_view(void)
 {
-	int i, histogram[10] = {0};
-	gen_random(10);
+    int x, y, i, j = 0, histogram[10] = {0};
+    gen_random(10);
 
-	for (i = 0; i < N; i++) {
-		histogram[a[i]]++;
-	}
+    for (i = 0; i < N; i++) {
+        histogram[a[i]]++;
+    }
 
-	for (i = 0; i < 10; i++) {
-		printf("%d ", i );
-		if (histogram[i] > 0) {
-			int j;
-			for (j = 0; j < histogram[i]; j++) {
-				printf("*");
-			}
-		}
-		printf("\n");
-	}
-	return 0;
+    for (i = 0; i < 10; i++) {
+        if (histogram[i] > j) {
+            j = histogram[i];
+        }
+    }
+
+    printf("0 1 2 3 4 5 6 7 8 9 \n");
+    for (x = 0; x < j; x++) {
+        for (y = 0; y < 10; y++) {
+            if (histogram[y] > 0) {
+                printf("* ");
+                histogram[y]--;
+            } else {
+                printf("  ");
+            }
+        }
+        printf("\n");
+    }
+}
+
+void row_view(void)
+{
+    int i, histogram[10] = {0};
+    gen_random(10);
+
+    for (i = 0; i < N; i++) {
+        histogram[a[i]]++;
+    }
+
+    for (i = 0; i < 10; i++) {
+        printf("%d ", i );
+        if (histogram[i] > 0) {
+            int j;
+            for (j = 0; j < histogram[i]; j++) {
+                printf("*");
+            }
+        }
+        printf("\n");
+    }
 }
 
 void gen_random(int upper_bound)
 {
-	int i;
-	srand(time(NULL));
-	for (i = 0; i < N; i++) {
-		a[i] = rand() % upper_bound;
-	}
+    int i;
+    srand(time(NULL));
+    for (i = 0; i < N; i++) {
+        a[i] = rand() % upper_bound;
+    }
 }
 
 int howmany(int value)
 {
-	int count = 0, i;
-	for (i = 0; i < N; i++) {
-		if (a[i] == value) {
-			++count;
-		}
-	}
-	return count;
+    int count = 0, i;
+    for (i = 0; i < N; i++) {
+        if (a[i] == value) {
+            ++count;
+        }
+    }
+    return count;
 }
 ```
 ### 4. 字符串
