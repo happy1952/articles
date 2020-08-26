@@ -955,9 +955,9 @@ void column_view(void);
 
 int main(void)
 {
-	row_view();
-	printf("\n");
-	column_view();
+    row_view();
+    printf("\n");
+    column_view();
     return 0;
 }
 
