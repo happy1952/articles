@@ -1200,6 +1200,165 @@ $ indent -kr -i8 main.c
 ## 第十章 gdb
 
 ### 1. 单步执行和跟踪函数调用
+示例代码：
+```c
+#include <stdio.h>
+
+int add_range(int low, int high)
+{
+    int i, sum;
+    for (i = low; i <= high; i++)
+        sum = sum + i;
+    return sum;
+}
+
+int main(void)
+{
+    int result[100];
+    result[0] = add_range(1, 10);
+    result[1] = add_range(1, 100);
+    printf("result[0]=%d\nresult[1]=%d\n", result[0], result[1]);
+    return 0;
+}
+```
+add_range函数从low加到high，在main函数中首先从1加到10，把结果保存下来，然后从1加到100，再把结果保存下来，最后打印的两个结果是：
+```bash
+result[0]=55
+result[1]=5105 # 显然该结果不对，正确结果应该是5050
+```
+
+```bash
+# 在编译时加上-g选项，生成的可执行文件才能用gdb进行源码级调试
+$ gcc -g -Wall main.c -o main
+
+# 进入调试
+$ gdb main
+
+# gdb提供一个类似Shell的命令行环境，下面的(gdb)就是提示符，在这个提示符下输入help可以查看命令的类别：
+(gdb) help
+
+# 也可以进一步查看某一类别中有哪些命令
+(gdb) help files
+
+# 从第一行开始列出源码：
+(gdb) list 1
+
+# list一次只列10行，如果要从第11行开始继续列源代码可以输入：
+(gdb) list
+
+# 也可以什么都不输直接敲回车，gdb提供了一个很方便的功能，在提示符下直接敲回车表示重复上一条命令。
+(gdb) (直接回车，重复上一条命令)
+
+# gdb的很多常用命令有简写形式，例如list命令可以写成l，要列一个函数的源代码也可以用函数名做参数：
+(gdb) l add_range
+
+# start命令 开始执行程序
+(gdb) start
+
+# next命令（简写为n） 控制这些语句一条一条地执行
+(gdb) n
+
+# step命令（简写为s） 进入add_range函数中去跟踪执行
+(gdb) s
+
+# backtrace命令（简写为bt） 可以查看函数的调用堆栈
+(gdb) bt
+#0  add_range (low=1, high=10) at test024.c:6
+#1  0x0000000000400570 in main () at test024.c:14
+# 可见当前的add_range函数是被main函数调用的，main函数传进来的参数是low=1，high=10。main函数的栈帧编号为1，add_range的栈帧编号为0。
+
+# info命令（简写为i） 查看add_range函数局部变量的值
+(gdb) i locals
+i = 0
+sum = 0
+
+# 如果想查看main函数当前局部变量的值也可以做到，先用frame命令（简写为f）选择1号栈帧然后再查看局部变量
+(gdb) f 1
+#1  0x0000000000400570 in main () at test024.c:14
+14	    result[0] = add_range(1, 10);
+(gdb) i locals
+result = {0 <repeats 30 times>, -134224160, 32767, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -134223256, 32767, -7728, 32767, -7744, 32767, 1700966438, 0, -138851993, 32767, 2, 0 <repeats 31 times>, 1, 0, 4195837, 0, 0, 0, 0, 0, 4195760, 0, 4195392, 0, -7328, 32767, 0, 0}
+
+# 注意到result数组中有很多元素具有杂乱无章的值，我们知道未经初始化的局部变量具有不确定的值。
+
+# print命令（简写为p）打印出变量sum的值
+(gdb) p sum
+$1 = 3
+
+# 第一次循环i是1，第二次循环i是2，加起来是3，没错。这里的$1表示gdb保存着这些中间结果，$后面的编号会自动增长，在命令中可以用$1、$2、$3等编号代替相应的值。由于我们本来就知道第一次调用的结果是正确的，再往下跟也没意义了，可以用finish命令让程序一直运行到从当前函数返回为止：
+(gdb) finish
+Run till exit from #0  add_range (low=1, high=10) at test024.c:7
+0x0000000000400570 in main () at test024.c:14
+14	    result[0] = add_range(1, 10);
+Value returned is $3 = 55
+
+# 返回值是55，当前正准备执行赋值操作，用s命令赋值
+(gdb) s
+15	    result[1] = add_range(1, 100);
+
+# 然后查看result数组
+(gdb) p result
+$4 = {55, 0 <repeats 29 times>, -134224160, 32767, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -134223256, 32767, -7728, 32767, -7744, 32767, 1700966438, 0, -138851993, 
+  32767, 2, 0 <repeats 31 times>, 1, 0, 4195837, 0, 0, 0, 0, 0, 4195760, 0, 4195392, 0, -7328, 32767, 0, 0}
+
+# 下面用s命令进入第二次add_range调用，进入之后首先查看参数和局部变量：
+(gdb) s
+add_range (low=1, high=100) at test024.c:6
+6	    for (i = low; i <= high; i++)
+
+(gdb) bt
+#0  add_range (low=1, high=100) at test024.c:6
+#1  0x0000000000400585 in main () at test024.c:15
+
+(gdb) i locals
+i = 11
+sum = 55 # 由于局部变量i和sum没有初始化，所以具有不确定的值，又由于两次调用是挨着的，i和sum正好取了上次调用的值。i的初始值不是0倒没有关系，在for循环中会赋值为0，但sum如果初始值不是0，累加得到的结果就错了。
+
+# 把sum的初始值改为0后继续运行
+(gdb) set var sum=0
+(gdb) finish
+Run till exit from #0  add_range (low=1, high=100) at test024.c:6
+0x0000000000400585 in main () at test024.c:15
+15	    result[1] = add_range(1, 100);
+Value returned is $6 = 5050
+
+(gdb) n
+16	    printf("result[0]=%d\nresult[1]=%d\n", result[0], result[1]);
+
+(gdb) (直接回车)
+result[0]=55
+result[1]=5050
+17	    return 0;
+# 这样结果就对了。修改变量除了用set命令之外也可以用print命令，因为print命令后面跟的是表达式，而我们知道赋值和函数调用也都是表达式，所以也可以用print命令修改变量的值或者调用函数：
+(gdb) p result[2]=33
+$5 = 33
+
+(gdb) p printf("result[2]=%d\n", result[2])
+result[2]=33
+$6 = 13
+# 我们讲过，printf的返回值表示实际打印的字符数，所以$6的结果是13。
+
+# 退出gdb环境
+(gdb) quit
+```
+
+总结一下本节用到的gdb命令：
+命令                | 描述
+--------------------|---------------------------
+backtrace (或bt)    | 查看各级函数调用及参数
+finish              | 连续运行到当前函数返回为止，然后停下来等待命令输入
+frame (或f) 帧编号  | 选择栈帧
+info (或i) locals   | 查看当前栈帧局部变量的值
+list (或l)          | 列出源代码，接着上次的位置往下列，每次列10行
+list 行号           | 列出从第几行开始的源代码
+list 函数名         | 列出某个函数的源代码
+next (或n)          | 执行下一行语句
+print (或p)         | 打印表达式的值，通过表达式可以修改变量的值或者调用函数
+quit (或q)          | 退出gdb调试环境
+set var             | 修改变量的值
+start               | 开始执行程序，停在main函数第一行语句前面等待命令输入
+step (或s)          | 执行下一行语句，如果有函数调用则进入函数中
+
 ### 2. 断点
 ### 3. 观察点
 ### 4. 段错误
