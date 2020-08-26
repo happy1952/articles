@@ -205,23 +205,23 @@ int main(void) {
 
 void newline(void)
 {
-	printf("\n");
+    printf("\n");
 }
 
 void threeline(void)
 {
-	newline();
-	newline();
-	newline();
+    newline();
+    newline();
+    newline();
 }
 
 int main(void)
 {
-	printf("Three lines:\n");
-	threeline();
-	printf("Another three lines.\n");
-	threeline();
-	return 0;
+    printf("Three lines:\n");
+    threeline();
+    printf("Another three lines.\n");
+    threeline();
+    return 0;
 }
 ```
 通过这个简单的例子可以体会到：
@@ -249,13 +249,13 @@ void threeline(void);
 
 void print_time(int hour, int minute)
 {
-	printf("%d:%d\n", hour, minute);
+    printf("%d:%d\n", hour, minute);
 }
 
 int main(void)
 {
-	print_time(23, 59);
-	return 0;
+    print_time(23, 59);
+    return 0;
 }
 ```
 我们调用print_time(23, 59)时，函数中的参数hour就代表23，参数minute就代表59。确切地说，当我们讨论函数中的hour这个参数时，我们所说的“参数”是指形参（Parameter），当我们讨论传一个参数23给函数时，我们所说的“参数”是指实参（Argument），但我习惯都叫参数而不习惯总把形参、实参这两个文绉绉的词挂在嘴边（事实上大多数人都不习惯），读者可以根据上下文判断我说的到底是形参还是实参。记住这条基本原理：形参相当于函数中定义的变量，调用函数传递参数的过程相当于定义形参变量并且用实参的值来初始化。
@@ -382,11 +382,11 @@ switch (控制表达式) {
 
 void print_logarithm(double x)
 {
-	if (x <= 0.0) {
-		printf("Positive numbers only, please.\n");
-		return;
-	}
-	printf("The log of x is %f", log(x));
+    if (x <= 0.0) {
+        printf("Positive numbers only, please.\n");
+        return;
+    }
+    printf("The log of x is %f", log(x));
 }
 ```
 
@@ -395,7 +395,7 @@ void print_logarithm(double x)
 ```c
 int is_even(int x)
 {
-	return !(x % 2);
+    return !(x % 2);
 }
 ```
 
@@ -500,11 +500,11 @@ for语句的语法是：
 ```c
 int factorial(int n)
 {
-	int result = 1;
-	int i;
-	for(i = 1; i <= n; ++i)
-		result = result * i;
-	return result;
+    int result = 1;
+    int i;
+    for(i = 1; i <= n; ++i)
+        result = result * i;
+    return result;
 }
 ```
 ++i这个表达式相当于i = i + 1，++称为前缀自增运算符（prefix increment operator），类似的，--称为前缀自减运算符（prefix decrement operator），--i相当于i = i - 1。如果把++i这个表达式看作一个函数调用，除了传入一个参数返回一个值（等于参数值加1）之外，还产生一个Side Effect，就是把变量i的值增加了1。
@@ -521,15 +521,15 @@ continue语句跳出当前循环后又回到循环体的开头准备执行下一
 
 int main(void)
 {
-	int i, j;
-	for (i = 1; i <= 100; i++) {
-		for (j = 2; j < i; j++)
-			if (i % j == 0)
-				break;
-		if (j == i)
-			printf("%d\n", i);
-	}
-	return 0;
+    int i, j;
+    for (i = 1; i <= 100; i++) {
+        for (j = 2; j < i; j++)
+            if (i % j == 0)
+                break;
+        if (j == i)
+            printf("%d\n", i);
+    }
+    return 0;
 }
 ```
 
@@ -538,13 +538,13 @@ goto语句实现无条件跳转。我们知道break只能跳出最内层的循�
 
 ```
 for (...)
-	for (...) {
-		...
-		if (出现错误条件)
-			goto error;
-	}
+    for (...) {
+        ...
+        if (出现错误条件)
+            goto error;
+    }
 error:
-	出错处理;
+    出错处理;
 ```
 这里的error:叫做标号（Label），任何语句前面都可以加若干个标号，每个标号的命名也要遵循标识符的命名规则。
 
@@ -608,9 +608,9 @@ int main(void)
     z.x = x;
     z.y = 4.0;
     if (z.y < 0)
-		printf("z=%f%fi\n", z.x, z.y);
-	else
-		printf("z=%f+%fi\n", z.x, z.y);
+        printf("z=%f%fi\n", z.x, z.y);
+    else
+        printf("z=%f+%fi\n", z.x, z.y);
     return 0;
 }
 ```
@@ -685,67 +685,63 @@ z = add_complex(z, z);
 #include <math.h>
 
 struct complex_struct {
-	double x, y;
+    double x, y;
 };
 
 double real_part(struct complex_struct z)
 {
-	return z.x;
+    return z.x;
 }
 
 double img_part(struct complex_struct z)
 {
-	return z.y;
+    return z.y;
 }
 
 double magnitude(struct complex_struct z)
 {
-	return sqrt(z.x * z.x + z.y * z.y);
+    return sqrt(z.x * z.x + z.y * z.y);
 }
 
 double angle(struct complex_struct z)
 {
-	return atan2(z.y, z.x);
+    return atan2(z.y, z.x);
 }
 
 struct complex_struct make_from_real_img(double x, double y)
 {
-	struct complex_struct z;
-	z.x = x;
-	z.y = y;
-	return z;
+    struct complex_struct z;
+    z.x = x;
+    z.y = y;
+    return z;
 }
 
 struct complex_struct make_from_mag_ang(double r, double A)
 {
-	struct complex_struct z;
-	z.x = r * cos(A);
-	z.y = r * sin(A);
-	return z;
+    struct complex_struct z;
+    z.x = r * cos(A);
+    z.y = r * sin(A);
+    return z;
 }
 
 struct complex_struct add_complex(struct complex_struct z1, struct complex_struct z2)
 {
-	return make_from_real_img(real_part(z1) + real_part(z2),
-				  img_part(z1) + img_part(z2));
+    return make_from_real_img(real_part(z1) + real_part(z2), img_part(z1) + img_part(z2));
 }
 
 struct complex_struct sub_complex(struct complex_struct z1, struct complex_struct z2)
 {
-	return make_from_real_img(real_part(z1) - real_part(z2),
-				  img_part(z1) - img_part(z2));
+    return make_from_real_img(real_part(z1) - real_part(z2), img_part(z1) - img_part(z2));
 }
 
 struct complex_struct mul_complex(struct complex_struct z1, struct complex_struct z2)
 {
-	return make_from_mag_ang(magnitude(z1) * magnitude(z2),
-				 angle(z1) + angle(z2));
+    return make_from_mag_ang(magnitude(z1) * magnitude(z2), angle(z1) + angle(z2));
 }
 
 struct complex_struct div_complex(struct complex_struct z1, struct complex_struct z2)
 {
-	return make_from_mag_ang(magnitude(z1) / magnitude(z2),
-				 angle(z1) - angle(z2));
+    return make_from_mag_ang(magnitude(z1) / magnitude(z2), angle(z1) - angle(z2));
 }
 ```
 
@@ -777,27 +773,27 @@ int main()
     enum coordinate_type {RECTANGULAR, POLAR};
     int RECTANGULAR; /* 命名冲突 */
     printf("%d %d\n", RECTANGULAR, POLAR);
-	return 0;
+    return 0;
 }
 ```
 complex_struct结构体的格式变了，就需要修改上节复数存储表示层的函数，但只要保持函数接口不变就不会影响到上层函数。例如：
 ```c
 struct complex_struct make_from_real_img(double x, double y)
 {
-	struct complex_struct z;
-	z.t = RECTANGULAR;
-	z.a = x;
-	z.b = y;
-	return z;
+    struct complex_struct z;
+    z.t = RECTANGULAR;
+    z.a = x;
+    z.b = y;
+    return z;
 }
 
 struct complex_struct make_from_mag_ang(double r, double A)
 {
-	struct complex_struct z;
-	z.t = POLAR;
-	z.a = r;
-	z.b = A;
-	return z;
+    struct complex_struct z;
+    z.t = POLAR;
+    z.a = r;
+    z.b = A;
+    return z;
 }
 ```
 
