@@ -1360,5 +1360,148 @@ start               | 开始执行程序，停在main函数第一行语句前面
 step (或s)          | 执行下一行语句，如果有函数调用则进入函数中
 
 ### 2. 断点
+断点调试实例：
+```c
+#include <stdio.h>
+
+int main(void)
+{
+    int sum = 0, i = 0;
+    char input[5];
+
+    while (1) {
+        scanf("%s", input);
+        for (i = 0; input[i] != '\0'; i++)
+            sum = sum*10 + input[i] - '0';
+        printf("input=%d\n", sum);
+    }
+    return 0;
+}
+```
+
+这个程序的作用是：首先从键盘读入一串数字存到字符数组input中，然后转换成整型存到sum中，然后打印出来，一直这样循环下去。scanf("%s", input);这个调用的功能是等待用户输入一个字符串并回车，scanf把其中第一段非空白（非空格、Tab、换行）的字符串保存到input数组中，并自动在末尾添加'\0'。接下来的循环从左到右扫描字符串并把每个数字累加到结果中，例如输入是"2345"，则循环累加的过程是(((0*10+2)*10+3)*10+4)*10+5=2345。注意字符型的'2'要减去'0'的ASCII码才能转换成整数值2。下面是编译运行结果：
+```bash
+$ gcc main.c -g -Wall -o main
+$ ./main
+123
+input=123
+234
+input=123234
+(Ctrl-c 退出程序)
+```
+
+又是这种现象，第一次是对的，第二次就不对。可是这个程序我们并没有忘了赋初值，不仅sum赋了初值，连不必赋初值的i都赋了初值。下面开始调试：
+```bash
+$ gdb main
+...
+(gdb) start
+
+# 使用display命令使得每次停下来的时候都显示当前sum的值
+(gdb) display sum
+1: sum = 0
+
+# 继续往下执行
+(gdb) n
+9	        scanf("%s", input);
+1: sum = 0
+
+# 输入123
+(gdb) 
+123
+10	        for (i = 0; input[i] != '\0'; i++)
+1: sum = 0
+
+# undisplay命令可以取消跟踪显示，变量sum的编号是1，可以用undisplay 1命令取消它的跟踪显示。这个循环应该没有问题，因为上面第一次输入时打印的结果是正确的。如果不想一步一步走这个循环，可以用break命令（简写为b）在第9行设一个断点（Breakpoint）：
+(gdb) b 9
+Breakpoint 2 at 0x4005b3: file test025.c, line 9.
+# break命令的参数也可以是函数名，表示在某个函数开头设断点。现在用continue命令（简写为c）连续运行而非单步运行，程序到达断点会自动停下来，这样就可以停在下一次循环的开头：
+(gdb) c
+Continuing.
+input=123
+
+Breakpoint 2, main () at test025.c:9
+9	        scanf("%s", input);
+1: sum = 123
+
+# 然后输入新的字符串准备转换
+(gdb) n
+234
+10	        for (i = 0; input[i] != '\0'; i++)
+1: sum = 123
+# 问题暴露出来了，新的转换应该再次从0开始累加，而sum现在已经是123了，原因在于新的循环没有把sum归零。可见断点有助于快速跳过没有问题的代码，然后在有问题的代码上慢慢走慢慢分析，“断点加单步”是使用调试器的基本用法。
+
+# 一次调试可以设置多个断点，用info命令可以查看已经设置的断点：
+(gdb) b 12
+Breakpoint 3 at 0x400607: file test025.c, line 12.
+
+(gdb) i breakpoints
+Num     Type           Disp Enb Address            What
+2       breakpoint     keep y   0x00000000004005b3 in main at test025.c:9
+	breakpoint already hit 1 time
+3       breakpoint     keep y   0x0000000000400607 in main at test025.c:12
+
+# 每个断点都有一个编号，可以用编号指定删除某个断点：
+(gdb) delete breakpoints 2
+
+(gdb) i breakpoints 
+Num     Type           Disp Enb Address            What
+3       breakpoint     keep y   0x0000000000400607 in main at test025.c:12
+
+# 有时候一个断点暂时不用可以禁用掉而不必删除，这样以后想用的时候可以直接启用，而不必重新从代码里找应该在哪一行设断点：
+(gdb) disable breakpoints 3
+
+(gdb) i breakpoints 
+Num     Type           Disp Enb Address            What
+3       breakpoint     keep n   0x0000000000400607 in main at test025.c:12
+
+(gdb) enable 3
+
+(gdb) i breakpoints 
+Num     Type           Disp Enb Address            What
+3       breakpoint     keep y   0x0000000000400607 in main at test025.c:12
+
+(gdb) delete breakpoints
+Delete all breakpoints? (y or n) y
+
+(gdb) i breakpoints 
+No breakpoints or watchpoints.
+
+# gdb的断点功能非常灵活，还可以设置断点在满足某个条件时才激活，例如我们仍然在循环开头设置断点，但是仅当sum不等于0时才中断，然后用run命令（简写为r）重新从程序开头连续运行：
+(gdb) break 9 if sum != 0
+Breakpoint 5 at 0x4005b3: file test025.c, line 9.
+
+(gdb) i breakpoints 
+Num     Type           Disp Enb Address            What
+5       breakpoint     keep y   0x00000000004005b3 in main at test025.c:9
+	stop only if sum != 0
+
+(gdb) r
+The program being debugged has been started already.
+Start it from the beginning? (y or n) y
+Starting program: /data/wwwroot/learnC/a.out 
+123
+input=123
+
+Breakpoint 5, main () at test025.c:9
+9	        scanf("%s", input);
+1: sum = 123
+# 结果是第一次执行scanf之前没有中断，第二次却中断了。
+```
+
+总结一下本节用到的gdb命令：
+命令                      | 描述
+--------------------------|---------------------------
+break (或b) 行号           | 在某一行设置断点
+break 函数名               | 在某个函数开头设置断点
+break ... if ...          | 设置条件断点
+continue (或c)            | 从当前位置开始连续运行程序
+delete breakpoints 断点号 | 删除断点
+display 变量名            | 跟踪查看某个变量，每次停下来都显示它的值
+disable breakpoints 断点号 | 禁用断点
+enable 断点号             | 启用断点
+info (或i) breakpoints    | 查看当前设置了哪些断点
+run (或r)                 | 从头开始连续运行程序
+undisplay 跟踪显示号       | 取消跟踪显示
+
 ### 3. 观察点
 ### 4. 段错误
