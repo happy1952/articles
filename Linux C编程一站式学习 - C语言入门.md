@@ -1028,10 +1028,178 @@ int howmany(int value)
 }
 ```
 ### 4. 字符串
+字符串可以看作一个数组，它的每个元素是字符型的，例如字符串"Hello, world.\n"图示如下：
 
+![字符串](./images/array.string.png "字符串")
+
+注意每个字符末尾都有一个字符'\0'做结束符，这里的\0是ASCII码的八进制表示，也就是ASCII码为0的NULL字符，在C语言中这种字符串也称为以零结尾的字符串（Null-terminated String）。数组元素可以通过数组名加下标的方式访问，字符串字面值也可以像数组一样使用，可以加下标访问其中的字符：
+```c
+char c = "Hello, world.\n"[0];
+```
+但是通过下标修改其中的字符却是不允许的：
+```c
+/* 编译错误，字符串字面值是只读的，不允许修改。 */
+"Hello, world.\n"[0] = 'A';
+```
+前面讲过数组可以像结构体一样初始化，如果是字符数组，也可以用一个字符串字面值来初始化：
+```c
+char str[10] = "Hello";
+```
+相当于：
+```c
+char str[10] = {'H', 'e', 'l', 'l', 'o', '\0'};
+```
+str的后四个元素没有指定，自动初始化为0，即Null字符。
+
+如果用于初始化的字符串字面值比数组还长，比如：
+```c
+char str[10] = "Hello, world.\n";
+```
+则数组str只包含字符串的前10个字符，不包含Null字符，这种情况编译器会给出警告。如果要用一个字符串字面值准确的初始化一个字符数组，最好的办法是不指定长度，让编译器自己计算：
+```c
+char str[] = "Hello, world.\n";
+```
+字符串字面值的长度包括Null字符在内一共15个字符，编译器会确定数组str的长度为15。
+
+有一种情况需要特别注意，如果用于初始化的字符串字面值比数组刚好长出一个Null字符的长度，比如：
+```c
+char str[14] = "Hello, world.\n";
+```
+则数组str不包含Null字符，并且编译器不会给出警告。
+
+注意：printf会从数组str的开头一直打印到Null字符为止，Null字符本身是Non-printable字符，不打印。这其实是一个危险的信号：如果数组str中没有Null字符，那么printf函数就会访问越界，后果可能会很诡异：有时候打印出乱码，有时候看起来没错误，有时候引起程序崩溃。
 
 ### 5. 多维数组
+就像结构体可以嵌套一样，数组也可以嵌套，一个数组的元素可以是另外一个数组，这样就构成了多维数组（Multi-dimensional Array）。
+```c
+/* 定义并初始化一个二维数组 */
+int a[3][2] = {1, 2, 3, 4, 5};
+/** 
+ * 数组a有3个元素，a[0], a[1], a[2] 
+ * a[0]也是一个数组，它有两个元素：a[0][0]， a[0][1]，值分别是1、2。
+ * a[1]两个元素值分别是3、4。
+ * a[2]两个元素值分别是5、0。
+ **/
+```
 
-## C语言本质（Bottom Up）
+![多维数组](./images/array.multidim.png "多维数组")
 
-## Linux系统编程
+从概念模型上看，这个二维数组是三列两行的表格，元素的两个下标分别是行号和列号。从物理模型上看，这六个元素在存储器中仍然是连续存储的，就像一维数组一样，相当于把概念模型的表格一行一行接起来拼成一串，C语言的这种存储方式称为Row-major方式，而有些编程语言（例如FORTRAN）是把概念模型的表格一列一列接起来拼成一串存储的，称为Column-major方式。
+
+多维数组也可以像嵌套结构体一样用嵌套initializer初始化，例如上面的二维数组也可以这样初始化：
+```c
+int a[][2] = {
+                {1, 2},
+                {3, 4},
+                {5, }
+            };
+```
+注意，除了第一维的长度可以由编译器自动计算而不需要指定，其余各维都必须明确指定长度。利用C99的新特性也可以叫做Memberwise Initialization，例如：
+```c
+int a[3][2] = {[0][1] = 9, [2][1] = 8};
+```
+结构体和数组嵌套的情况也可以做Memberwise Initialization，例如：
+```c
+struct complex_struct {
+    double x, y;
+} a[4] = {[0].x = 8.0};
+
+struct {
+    double x, y;
+    int count[4];
+} s = {.count[2] = 9};
+```
+
+如果是多维字符数组，也可以嵌套使用字符串字面值做initializer，例如：
+```c
+#include <stdio.h>
+
+void print_day(int day)
+{
+    char days[8][10] = {"", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
+
+    if (day < 1 || day > 7) {
+        printf("Illegal day number!\n");
+    }
+    printf("%s\n", days[day]);
+}
+
+int main(void)
+{
+    print_day(3);
+    return 0;
+}
+```
+这个程序和例 4.1 “switch语句”的功能其实是一样的，但是代码简洁多了。简洁的代码不仅可读性强，而且维护成本也低，像例 4.1 “switch语句”那样一堆case、printf和break，如果漏写一个break就要出Bug。这个程序之所以简洁，是因为用数据代替了代码。具体来说，通过下标访问字符串组成的数组可以代替一堆case分支判断，这样就可以把每个case里重复的代码（printf调用）提取出来，从而又一次达到了“提取公因式”的效果。这种方法称为数据驱动的编程（Data-driven Programming），写代码最重要的是选择正确的数据结构来组织信息，设计控制流程和算法尚在其次，只要数据结构选择得正确，其它代码自然而然就变得容易理解和维护了，就像这里的printf自然而然就被提取出来了。
+
+示例：石头剪刀布
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+int main(void)
+{
+    char gesture[3][10] = {"scissor", "stone", "cloth"};
+    int man, computer, result, ret;
+
+    srand(time(NULL));
+
+    while (1) {
+        computer = rand() % 3;
+        printf("\nInput your gesture (0-scissor 1-stone 2-cloth):\n");
+        ret = scanf("%d", &man);
+
+        if (ret != 1 || man < 0 || man > 2) {
+            printf("Invalid input! Please input 0, 1 or 2.\n");
+            continue;
+        }
+        printf("Your gesture: %s\tComputer's gesture: %s\n", gesture[man], gesture[computer]);
+
+        result = (man - computer + 4) % 3 - 1;
+        if (result > 0) {
+            printf("You win!\n");
+        } else if (result == 0) {
+            printf("Draw!\n");
+        } else {
+            printf("You lose!\n");
+        }
+    }
+    return 0;
+}
+```
+
+## 第九章 编码风格
+
+编程并非是告诉计算机如何做某件事，而是告诉人们程序员是如何指示计算机做某件事。这里的关键在于：程序不仅仅是给计算机看的，更是给人看的。
+
+### 1. 缩进和空白
+### 2. 注释
+### 3. 标识符命名
+标识符命名应遵循以下原则：
+1. 标识符命名要清晰明了，可以使用完整的单词和易于理解的缩写。短的单词可以通过去元音形成缩写，较长的单词可以取单词的头几个字母形成缩写。看别人的代码看多了就可以总结出一些缩写惯例，例如count写成cnt，block写成blk，length写成len，window写成win，message写成msg，number写成nr，temporary可以写成temp，也可以进一步写成tmp，最有意思的是internationalization写成i18n，词根trans经常缩写成x，例如transmit写成xmt。我就不多举例了，请读者在看代码时自己注意总结和积累。
+2. 内核编码风格规定变量、函数和类型采用全小写加下划线的方式命名，常量（比如宏定义和枚举常量）采用全大写加下划线的方式命名，比如上一节举例的函数名radix_tree_insert、类型名struct radix_tree_root、常量名RADIX_TREE_MAP_SHIFT等。
+3. 全局变量和全局函数的命名一定要详细，不惜多用几个单词多写几个下划线，例如函数名radix_tree_insert，因为它们在整个项目的许多源文件中都会用到，必须让使用者明确这个变量或函数是干什么用的。局部变量和只在一个源文件中调用的内部函数的命名可以简略一些，但不能太短。尽量不要使用单个字母做变量名，只有一个例外：用i、j、k做循环变量是可以的。
+4. 针对中国程序员的一条特别规定：禁止用汉语拼音做标识符，可读性极差。
+
+### 4. 函数
+每个函数都应该设计得尽可能简单，简单的函数才容易维护。应遵循以下原则：
+1. 实现一个函数只是为了做好一件事情，不要把函数设计成用途广泛、面面俱到的，这样的函数肯定会超长，而且往往不可重用，维护困难。
+2. 函数内部的缩进层次不宜过多，一般以少于4层为宜。如果缩进层次太多就说明设计得太复杂了，应考虑分割成更小的函数（Helper Function）来调用。
+3. 函数不要写得太长，建议在24行的标准终端上不超过两屏，太长会造成阅读困难，如果一个函数超过两屏就应该考虑分割函数了。[CodingStyle]中特别说明，如果一个函数在概念上是简单的，只是长度很长，这倒没关系。例如函数由一个大的switch组成，其中有非常多的case，这是可以的，因为各case分支互不影响，整个函数的复杂度只等于其中一个case的复杂度，这种情况很常见，例如TCP协议的状态机实现。
+4. 执行函数就是执行一个动作，函数名通常应包含动词，例如get_current、radix_tree_insert。
+5. 比较重要的函数定义上侧必须加注释，说明此函数的功能、参数、返回值、错误码等。
+6. 另一种度量函数复杂度的办法是看有多少个局部变量，5到10个局部变量已经很多了，再多就很难维护了，应该考虑分割成多个函数。
+
+### 5. indent工具
+```bash
+# indent工具可以把代码格式化成某种风格，比如：-kr选项表示K&R风格，-i8表示缩进8个空格的长度。
+$ indent -kr -i8 main.c
+```
+
+## 第十章 gdb
+
+### 1. 单步执行和跟踪函数调用
+### 2. 断点
+### 3. 观察点
+### 4. 段错误
