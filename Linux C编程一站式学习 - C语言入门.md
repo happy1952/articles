@@ -1275,7 +1275,7 @@ sum = 0
 # 如果想查看main函数当前局部变量的值也可以做到，先用frame命令（简写为f）选择1号栈帧然后再查看局部变量
 (gdb) f 1
 #1  0x0000000000400570 in main () at test024.c:14
-14	    result[0] = add_range(1, 10);
+14      result[0] = add_range(1, 10);
 (gdb) i locals
 result = {0 <repeats 30 times>, -134224160, 32767, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -134223256, 32767, -7728, 32767, -7744, 32767, 1700966438, 0, -138851993, 32767, 2, 0 <repeats 31 times>, 1, 0, 4195837, 0, 0, 0, 0, 0, 4195760, 0, 4195392, 0, -7328, 32767, 0, 0}
 
@@ -1289,12 +1289,12 @@ $1 = 3
 (gdb) finish
 Run till exit from #0  add_range (low=1, high=10) at test024.c:7
 0x0000000000400570 in main () at test024.c:14
-14	    result[0] = add_range(1, 10);
+14      result[0] = add_range(1, 10);
 Value returned is $3 = 55
 
 # 返回值是55，当前正准备执行赋值操作，用s命令赋值
 (gdb) s
-15	    result[1] = add_range(1, 100);
+15      result[1] = add_range(1, 100);
 
 # 然后查看result数组
 (gdb) p result
@@ -1304,7 +1304,7 @@ $4 = {55, 0 <repeats 29 times>, -134224160, 32767, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 # 下面用s命令进入第二次add_range调用，进入之后首先查看参数和局部变量：
 (gdb) s
 add_range (low=1, high=100) at test024.c:6
-6	    for (i = low; i <= high; i++)
+6       for (i = low; i <= high; i++)
 
 (gdb) bt
 #0  add_range (low=1, high=100) at test024.c:6
@@ -1319,16 +1319,16 @@ sum = 55 # 由于局部变量i和sum没有初始化，所以具有不确定的�
 (gdb) finish
 Run till exit from #0  add_range (low=1, high=100) at test024.c:6
 0x0000000000400585 in main () at test024.c:15
-15	    result[1] = add_range(1, 100);
+15      result[1] = add_range(1, 100);
 Value returned is $6 = 5050
 
 (gdb) n
-16	    printf("result[0]=%d\nresult[1]=%d\n", result[0], result[1]);
+16      printf("result[0]=%d\nresult[1]=%d\n", result[0], result[1]);
 
 (gdb) (直接回车)
 result[0]=55
 result[1]=5050
-17	    return 0;
+17      return 0;
 # 这样结果就对了。修改变量除了用set命令之外也可以用print命令，因为print命令后面跟的是表达式，而我们知道赋值和函数调用也都是表达式，所以也可以用print命令修改变量的值或者调用函数：
 (gdb) p result[2]=33
 $5 = 33
@@ -1402,13 +1402,13 @@ $ gdb main
 
 # 继续往下执行
 (gdb) n
-9	        scanf("%s", input);
+9           scanf("%s", input);
 1: sum = 0
 
 # 输入123
 (gdb) 
 123
-10	        for (i = 0; input[i] != '\0'; i++)
+10          for (i = 0; input[i] != '\0'; i++)
 1: sum = 0
 
 # undisplay命令可以取消跟踪显示，变量sum的编号是1，可以用undisplay 1命令取消它的跟踪显示。这个循环应该没有问题，因为上面第一次输入时打印的结果是正确的。如果不想一步一步走这个循环，可以用break命令（简写为b）在第9行设一个断点（Breakpoint）：
@@ -1420,13 +1420,13 @@ Continuing.
 input=123
 
 Breakpoint 2, main () at test025.c:9
-9	        scanf("%s", input);
+9           scanf("%s", input);
 1: sum = 123
 
 # 然后输入新的字符串准备转换
 (gdb) n
 234
-10	        for (i = 0; input[i] != '\0'; i++)
+10          for (i = 0; input[i] != '\0'; i++)
 1: sum = 123
 # 问题暴露出来了，新的转换应该再次从0开始累加，而sum现在已经是123了，原因在于新的循环没有把sum归零。可见断点有助于快速跳过没有问题的代码，然后在有问题的代码上慢慢走慢慢分析，“断点加单步”是使用调试器的基本用法。
 
@@ -1437,7 +1437,7 @@ Breakpoint 3 at 0x400607: file test025.c, line 12.
 (gdb) i breakpoints
 Num     Type           Disp Enb Address            What
 2       breakpoint     keep y   0x00000000004005b3 in main at test025.c:9
-	breakpoint already hit 1 time
+    breakpoint already hit 1 time
 3       breakpoint     keep y   0x0000000000400607 in main at test025.c:12
 
 # 每个断点都有一个编号，可以用编号指定删除某个断点：
@@ -1473,7 +1473,7 @@ Breakpoint 5 at 0x4005b3: file test025.c, line 9.
 (gdb) i breakpoints 
 Num     Type           Disp Enb Address            What
 5       breakpoint     keep y   0x00000000004005b3 in main at test025.c:9
-	stop only if sum != 0
+    stop only if sum != 0
 
 (gdb) r
 The program being debugged has been started already.
@@ -1483,7 +1483,7 @@ Starting program: /data/wwwroot/learnC/a.out
 input=123
 
 Breakpoint 5, main () at test025.c:9
-9	        scanf("%s", input);
+9           scanf("%s", input);
 1: sum = 123
 # 结果是第一次执行scanf之前没有中断，第二次却中断了。
 ```
@@ -1504,4 +1504,319 @@ run (或r)                 | 从头开始连续运行程序
 undisplay 跟踪显示号       | 取消跟踪显示
 
 ### 3. 观察点
+接着上一节的步骤，经过调试我们知道，虽然sum已经赋了初值0，但仍需要在while (1)循环的开头加上sum = 0;：
+
+观察点调试实例：
+```c
+#include <stdio.h>
+
+int main(void)
+{
+    int sum = 0, i = 0;
+    char input[5];
+
+    while (1)
+    {
+        sum = 0;
+        scanf("%s", input);
+        for (i = 0; input[i] != '\0'; i++) {
+            sum = sum * 10 + input[i] - '0';
+        }
+        printf("input=%d\n", sum);
+    }
+    return 0;
+}
+```
+
+使用scanf函数是非常凶险的，即使修正了这个Bug也还存在很多问题。如果输入的字符串超长了会怎么样？我们知道数组访问越界是不会检查的，所以scanf会写出界。现象是这样的：
+```bash
+$ ./main
+123
+input=123
+67
+input=67
+12345
+input=123407
+```
+
+下面用调试器看看最后这个诡异的结果是怎么出来的:
+```bash
+$ gdb main
+...
+(gdb) start
+Breakpoint 1 at 0x80483b5: file main.c, line 5.
+Starting program: /home/akaedu/main 
+main () at main.c:5
+5        int sum = 0, i = 0;
+(gdb) n
+9            sum = 0;
+(gdb) （直接回车）
+10            scanf("%s", input);
+(gdb) （直接回车）
+12345
+11            for (i = 0; input[i] != '\0'; i++)
+(gdb) p input
+$1 = "12345"
+```
+
+input数组只有5个元素，写出界的是scanf自动添的'\0'，用x命令看会更清楚一些：
+```bash
+(gdb) x/7b input
+0xbfb8f0a7:    0x31    0x32    0x33    0x34    0x35    0x00    0x00
+```
+
+x命令打印指定存储单元的内容。7b是打印格式，b表示每个字节一组，7表示打印7组，从input数组的第一个字节开始连续打印7个字节。前5个字节是input数组的存储单元，打印的正是十六进制ASCII码的'1'到'5'，第6个字节是写出界的'\0'。根据运行结果，前4个字符转成数字都没错，第5个错了，也就是i从0到3的循环都没错，我们设一个条件断点从i等于4开始单步调试：
+```bash
+(gdb) b 12 if i == 4
+Breakpoint 2 at 0x80483e6: file main.c, line 12.
+(gdb) c
+Continuing.
+
+Breakpoint 2, main () at main.c:12
+12                sum = sum*10 + input[i] - '0';
+(gdb) p sum
+$2 = 1234
+```
+
+现在sum是1234没错，根据运行结果是123407我们知道即将进行的这步计算肯定要出错，算出来应该是12340，那就是说input[4]肯定不是'5'了，事实证明这个推理是不严谨的：
+```bash
+(gdb) x/7b input
+0xbfb8f0a7:    0x31    0x32    0x33    0x34    0x35    0x04    0x00
+```
+
+input[4]的确是0x35，产生123407还有另外一种可能，就是在下一次循环中123450不是加上而是减去一个数得到123407。可现在不是到字符串末尾了吗？怎么会有下一次循环呢？注意到循环控制条件是input[i] != '\0'，而本来应该是0x00的位置现在莫名其妙地变成了0x04，因此循环不会结束。继续单步：
+```bash
+(gdb) n
+11            for (i = 0; input[i] != '\0'; i++)
+(gdb) p sum
+$3 = 12345
+(gdb) n
+12                sum = sum*10 + input[i] - '0';
+(gdb) x/7b input
+0xbfb8f0a7:    0x31    0x32    0x33    0x34    0x35    0x05    0x00
+```
+进入下一次循环，原来的0x04又莫名其妙地变成了0x05，这是怎么回事？这个暂时解释不了，但123407这个结果可以解释了，是12345*10 + 0x05 - 0x30得到的，虽然多循环了一次，但下次一定会退出循环了，因为0x05的后面是'\0'。
+
+input[4]后面那个字节到底是什么时候变的？可以用观察点（Watchpoint）来跟踪。我们知道断点是当程序执行到某一代码行时中断，而观察点是当程序访问某个存储单元时中断，如果我们不知道某个存储单元是在哪里被改动的，这时候观察点尤其有用。下面删除原来设的断点，从头执行程序，重复上次的输入，用watch命令设置观察点，跟踪input[4]后面那个字节（可以用input[5]表示，虽然这是访问越界）：
+```bash
+(gdb) delete breakpoints 
+Delete all breakpoints? (y or n) y
+(gdb) start
+Breakpoint 1 at 0x80483b5: file main.c, line 5.
+Starting program: /home/akaedu/main 
+main () at main.c:5
+5        int sum = 0, i = 0;
+(gdb) n
+9            sum = 0;
+(gdb) （直接回车）
+10            scanf("%s", input);
+(gdb) （直接回车）
+12345
+11            for (i = 0; input[i] != '\0'; i++)
+(gdb) watch input[5]
+Hardware watchpoint 2: input[5]
+(gdb) i watchpoints 
+Num     Type           Disp Enb Address    What
+2       hw watchpoint  keep y              input[5]
+(gdb) c
+Continuing.
+Hardware watchpoint 2: input[5]
+
+Old value = 0 '\0'
+New value = 1 '\001'
+0x0804840c in main () at main.c:11
+11            for (i = 0; input[i] != '\0'; i++)
+(gdb) c
+Continuing.
+Hardware watchpoint 2: input[5]
+
+Old value = 1 '\001'
+New value = 2 '\002'
+0x0804840c in main () at main.c:11
+11            for (i = 0; input[i] != '\0'; i++)
+(gdb) c
+Continuing.
+Hardware watchpoint 2: input[5]
+
+Old value = 2 '\002'
+New value = 3 '\003'
+0x0804840c in main () at main.c:11
+11            for (i = 0; input[i] != '\0'; i++)
+```
+已经很明显了，每次都是回到for循环开头的时候改变了input[5]的值，而且是每次加1，而循环变量i正是在每次回到循环开头之前加1，原来input[5]就是变量i的存储单元，换句话说，i的存储单元是紧跟在input数组后面的。
+
+修正这个Bug对初学者来说有一定难度。如果你发现了这个Bug却没想到数组访问越界这一点，也许一时想不出原因，就会先去处理另外一个更容易修正的Bug：如果输入的不是数字而是字母或别的符号也能算出结果来，这显然是不对的，可以在循环中加上判断条件检查非法字符：
+```c
+while (1) {
+    sum = 0;
+    scanf("%s", input);
+    for (i = 0; input[i] != '\0'; i++) {
+        if (input[i] < '0' || input[i] > '9') {
+            printf("Invalid input!\n");
+            sum = -1;
+            break;
+        }
+        sum = sum*10 + input[i] - '0';
+    }
+    printf("input=%d\n", sum);
+}
+```
+这是治标不治本的解决方法。看起来输入超长的错误是不出现了，但只要没有找到根本原因就不可能真的解决掉，等到条件一变，它可能又冒出来了，在下一节你会看到它又以一种新的形式冒出来了。现在请思考一下为什么加上检查非法字符的代码之后输入超长也会报错。最后总结一下本节用到的gdb命令：
+命令                      | 描述
+--------------------------|---------------------------
+watch                     | 设置观察点
+info (或i) watchpoints    | 查看当前设置了哪些观察点
+x                         | 从某个位置开始打印存储单元的内容，全部当成字节来看，而不区分哪个字节属于哪个变量
+
+注意：不得不承认，在有些平台和操作系统上也未必得到这个结果，产生Bug的往往都是一些平台相关的问题，举这样的例子才比较像是真实软件开发中遇到的Bug，如果您的程序跑不出我这样的结果，那这一节您就凑合着看吧。
+
 ### 4. 段错误
+段错误调试实例一：
+```c
+#include <stdio.h>
+
+int main(void)
+{
+    int man = 0;
+    scanf("%d", man);
+    return 0;
+}
+```
+调试过程如下：
+```bash
+$ gdb main
+...
+(gdb) r
+Starting program: /home/akaedu/main 
+123
+
+Program received signal SIGSEGV, Segmentation fault.
+0xb7e1404b in _IO_vfscanf () from /lib/tls/i686/cmov/libc.so.6
+
+(gdb) bt
+#0  0xb7e1404b in _IO_vfscanf () from /lib/tls/i686/cmov/libc.so.6
+#1  0xb7e1dd2b in scanf () from /lib/tls/i686/cmov/libc.so.6
+#2  0x0804839f in main () at main.c:6
+```
+在gdb中运行，遇到段错误会自动停下来，这时可以用命令查看当前执行到哪一行代码了。gdb显示段错误出现在_IO_vfscanf函数中，用bt命令可以看到这个函数是被我们的scanf函数调用的，所以是scanf这一行引发的错误。仔细观察后发现man前面少了个&。
+
+继续调试上一节的程序，上一节最后提出修正Bug的方法是在循环中加上判断条件，如果不是数字就报错退出，不仅输入字母可以报错退出，输入超长的字符串也会报错退出。表面上看这个程序无论怎么运行都不出错了，但假如我们把while (1)循环去掉，每次执行程序只转换一个数：
+
+段错误调试实例二：
+```c
+#include <stdio.h>
+
+int main(void)
+{
+    int sum = 0, i = 0;
+    char input[5];
+
+    scanf("%s", input);
+    for (i = 0; input[i] != '\0'; i++) {
+        if (input[i] < '0' || input[i] > '9') {
+            printf("Invalid input!\n");
+            sum = -1;
+            break;
+        }
+        sum = sum * 10 + input[i] - '0';
+    }
+    printf("input=%d\n", sum);
+    return 0;
+}
+```
+
+编译运行：
+```bash
+$ ./main 
+1234567890
+Invalid input!
+input=-1
+
+# 段错误
+$ ./main
+12345678901234567890123456789
+Invalid input!
+input=-1
+Segmentation fault
+```
+
+我们按同样的方法进行调试：
+```bash
+$ gdb main
+...
+(gdb) r
+Starting program: /home/akaedu/main 
+1234567890abcdef
+Invalid input!
+input=-1
+
+Program received signal SIGSEGV, Segmentation fault.
+0x0804848e in main () at main.c:19
+19	}
+(gdb) l
+14			}
+15			sum = sum*10 + input[i] - '0';
+16		}
+17		printf("input=%d\n", sum);
+18		return 0;
+19	}
+```
+gdb指出段错误发生在第19行。可是这一行什么都没有啊，只有表示main函数结束的}括号。这可以算是一条规律，**如果某个函数的局部变量发生访问越界，有可能并不立即产生段错误，而是在函数返回时产生段错误。**
+
+想要写出Bug-free的程序是非常不容易的，即使scanf读入字符串这么一个简单的函数调用都会隐藏着各种各样的错误，有些错误现象是我们暂时没法解释的：为什么变量i的存储单元紧跟在input数组后面？为什么同样是访问越界，有时出段错误有时不出段错误？为什么访问越界的段错误在函数返回时才出现？还有最基本的问题，为什么scanf输入整型变量就必须要加&，否则就出段错误，而输入字符串就不要加&？这些问题在后续章节中都会解释清楚。其实现在讲scanf这个函数为时过早，读者还不具备充足的基础知识。但还是有必要讲的，学完这一阶段之后读者应该能写出有用的程序了，然而一个只有输出而没有输入的程序算不上是有用的程序，另一方面也让读者认识到，学C语言不可能不去了解底层计算机体系结构和操作系统的原理，不了解底层原理连一个scanf函数都没办法用好，更没有办法保证写出正确的程序。
+
+## 第十一章 排序与查找
+
+### 1. 算法的概念
+算法（Algorithm）是将一组输入转化成一组输出的一系列计算步骤，其中每个步骤必须能在有限时间内完成。算法是用来解决一类计算问题的，注意是一类问题，而不是一个特定的问题。
+
+算法的特性：
+1. 输入：算法必须有零个或多个输入
+2. 输出：算法至少有一个或多个输出
+3. 明确性：算法描述必须无歧义，以保证算法的实际执行结果是精确地符合要求或期望，通常要求实际运行结果是确定的。
+4. 有限性：算法在执行有限的步骤后，自动结束而不会出现无限循环，并且每一个步骤在可接受的时间内完成。
+5. 有效性：又称可行性。能够实现，算法中描述的操作都是可以通过已经实现的基本运算执行有限次来实现。
+
+### 2. 插入排序
+扑克牌的插入排序：
+
+![扑克牌的插入排序](./images/sortsearch.sortcards.png "扑克牌的插入排序")
+
+也许你没有意识到，但其实你的思考过程是这样的：现在抓到一张7，把它和手里的牌从右到左依次比较，7比10小，应该再往左插，7比5大，好，就插这里。为什么比较了10和5就可以确定7的位置？为什么不用再比较左边的4和2呢？因为这里有一个重要的前提：手里的牌已经是排好序的。现在我插了7之后，手里的牌仍然是排好序的，下次再抓到的牌还可以用这个方法插入。
+
+编程对一个数组进行插入排序也是同样道理，但和插入扑克牌有一点不同，不可能在两个相邻的存储单元之间再插入一个单元，因此要将插入点之后的数据依次往后移动一个单元。排序算法如下：
+```c
+#include <stdio.h>
+#define LEN 5
+
+int a[LEN] = {10, 5, 2, 4, 7};
+
+void insertion_sort(void)
+{
+    int i, j, key;
+
+    for (i = 1; i < LEN; i++) {
+        printf("%d %d %d %d %d\n", a[0], a[1], a[2], a[3], a[4]);
+
+        key = a[i];
+        j = i - 1;
+        while (j >= 0 && a[j] > key) {
+            a[j + 1] = a[j];
+            j--;
+        }
+        a[j + 1] = key;
+    }
+    printf("%d %d %d %d %d\n", a[0], a[1], a[2], a[3], a[4]);
+}
+
+int main(void)
+{
+    insertion_sort();
+    return 0;
+}
+```
+
+### 3. 算法的时间复杂度分析
+### 4. 归并排序
+### 5. 线性查找
+### 6. 折半查找
