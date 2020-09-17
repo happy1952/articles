@@ -30,7 +30,10 @@ static # 子进程的数量是固定的（pm.max_children）。
 ondemand # 进程在有需求时才产生（当请求时才启动。与 dynamic 相反，在服务启动时 pm.start_servers 就启动了。
 dynamic # 子进程的数量在下面配置的基础上动态设置：pm.max_children，pm.start_servers，pm.min_spare_servers，pm.max_spare_servers。
 
+利用sock文件代替tcp端口通信(本地机约可提高10%的性能)
+
 # 502 Bad Gateway 服务器端 502 时，可能的一种情况就是 PHP-FPM 子进程因为执行超时而退出后，Nginx没有得到正常的返回值导致的。
+# 另外还有就是 PHP-FPM 子进程不够用了，也会导致502
 request_terminate_timeout # 设置单个请求的超时中止时间。该选项可能会对 php.ini 设置中的 'max_execution_time' 因为某些特殊原因没有中止运行的脚本有用。设置为 '0' 表示 'Off'。可用单位：s（秒），m（分），h（小时）或者 d（天）。默认单位：s（秒）。默认值：0（关闭）。
 
 # 设置 PHP-FPM 慢日志，当子进程执行超过该时间后将被记录到慢日志中
@@ -79,4 +82,15 @@ pm.max_requests = 5
 request_terminate_timeout = 5 # 调低子进程超时时间，手动创造 502 Bad Gateway
 request_slowlog_timeout = 2
 slowlog = var/log/slow.log
+```
+
+
+```
+# 504 Gateway Time-out。Nginx fastcgi_connect_timeout、fastcgi_send_timeout、fastcgi_read_timeout 这三个参数已经达到请求时间上限，但是后端 PHP-FPM 子进程还没有返回执行结果。
+
+fastcgi_connect_timeout # 定义用于与FastCGI服务器建立连接的超时时间。请注意，此超时通常不能超过75秒。
+
+fastcgi_send_timeout # 设置将请求传输到FastCGI服务器的超时时间。仅在两个连续的写操作之间设置超时，而不是用于传输整个请求。如果FastCGI服务器在此时间内未收到任何信息，则连接将关闭。
+
+fastcgi_read_timeout # 定义用于从FastCGI服务器读取响应的超时时间。仅在两个连续的读取操作之间设置超时，而不是用于传输整个响应。如果FastCGI服务器在此时间内未传输任何内容，则连接将关闭。
 ```
