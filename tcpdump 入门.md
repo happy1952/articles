@@ -137,6 +137,10 @@ tcpdump -s 0 -A -vv 'tcp[((tcp[12:1] & 0xf0) >> 2):4] = 0x504f5354'
 
 ### 详细的状态说明及 Linux 相关参数
 
+```bash
+sysctl -a # 列出系统内核参数
+```
+
 1. SYN_SEND
     * 客户端尝试链接服务端，通过 open 方法。也就是 TCP 三次握手中的第一步之后，注意客户端状态
     * sysctl -w net.ipv4.tcp_syn_retries = 6，做为客户端可以设置 SYN 包的重试次数，默认 5 次
