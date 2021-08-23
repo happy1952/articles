@@ -102,6 +102,80 @@ tcpdump -s 0 -A -vv 'tcp[((tcp[12:1] & 0xf0) >> 2):4] = 0x47455420'
 tcpdump -s 0 -A -vv 'tcp[((tcp[12:1] & 0xf0) >> 2):4] = 0x504f5354'
 ```
 
+## 拓展阅读
+
+### 通常情况下一个正常的 TCP 链接都会有以下三个阶段：
+
+1. TCP 三次握手建立连接
+2. 数据传送
+3. TCP 四次挥手断开连接
+
+### 相关概念说明：
+
+* SYN 同步序列编号，Synchronize Sequence Numbers
+* ACK 确认编号，Acknowledgement Number
+* FIN 结束标志，FINish
+
+### TCP 三次握手（创建 open）
+
+* 客户端发起一个和服务端创建 TCP 连接的请求，这里是 SYN(j)
+* 服务端接受到客户端的创建请求后，返回两个信息：SYN(k) + ACK(j+1)
+* 客户端再接收到服务端的 ACK 信息校验成功后(j与j+1)，返回一个信息：ACK(k+1)
+* 服务端这时接收到客户端的 ACK 信息校验成功后(k与k+1)，不再返回信息，后面就进入数据通讯阶段
+
+### 数据通讯
+
+* 客户端/服务端 read/write 数据包
+
+### TCP 四次挥手（关闭 finish）
+
+* 客户端发起关闭请求，发送一个信息：FIN(m)
+* 服务端接受到信息后，首先返回 ACK(m+1)，表明自己已经收到消息
+* 服务端再准备好关闭之前，最后发送给客户端一个 FIN(n) 消息，询问客户端是否准备好关闭了
+* 客户端接受到服务端发送的消息后，返回一个确认信息：ACK(n+1)
+* 最后，服务端和客户端在双方都得到确认时，各自关闭或者回收对应的 TCP 连接
+
+### 详细的状态说明及 Linux 相关参数
+
+1. SYN_SEND
+    * 客户端尝试链接服务端，通过 open 方法。也就是 TCP 三次握手中的第一步之后，注意客户端状态
+    * sysctl -w net.ipv4.tcp_syn_retries = 6，做为客户端可以设置 SYN 包的重试次数，默认 5 次
+
+2. SYN_RECEIVED
+    * 服务端接受创建请求的 SYN 后，也就是 TCP 三次握手的第二步，发送 ACK 数据包之前
+    * sysctl -w net.ipv4.tcp_max_syn_backlog = 1024，设置该状态的等待队列数，默认 1024，调大后可以防止 SYN_FLOOD 攻击
+    * sysctl -w net.ipv4.tcp_syncookies = 1，打开 syncookie，在 syn backlog 队列不足的时候，提供一种机制临时将 syn 链接换出
+    * sysctl -w net.ipv4.tcp_synack_retries = 2，做为服务端返回 ACK 包的重试次数，默认 5 次
+
+3. ESTABLISHED
+    * 客户端接收到服务端的 ACK 包后的状态，服务端在发出 ACK 在一定时间后即为 ESTABLISHED
+    * sysctl -w net.ipv4.tcp_keepalive_time = 7200，默认为 7200 秒（2小时），系统针对空闲连接会进行心跳检查，如果超过 net.ipv4.tcp_keepalive_probes * net.ipv4.tcp_keepalive_intvl = 默认 11 分钟，终止对应的 TCP 连接，可适当调整心跳检查频率
+
+4. FIN_WAIT1
+    * 主动关闭的一方，在发出 FIN 请求后，也就是在 TCP 四次挥手的第一步
+
+5. CLOSE_WAIT
+    * 被动关闭的一方，在接受到客户端的 FIN 后，也就是 TCP 四次挥手的第二步
+
+6. FIN_WAIT2
+    * 主动关闭的一方，在接收到被动关闭一方的 ACK 后，也就是 TCP 四次挥手的第二步
+    * sysctl -w net.ipv4.tcp_fin_timeout = 60，可以设定被动关闭方返回 FIN 后的超时时间，有效回收连接，避免 SYN_FLOOD
+
+7. LASK_ACK
+    * 被动关闭的一方，在发送 ACK 一段时间后（确保客户端已收到），再发起一个 FIN 请求，也就是 TCP 四次挥手的第三步
+
+8. TIME_WAIT
+    * 主动关闭的一方，在收到被动关闭的 FIN 包后，发送 ACK，也就是 TCP 四次挥手的第四步
+    * sysctl -w net.ipv4.tcp_tw_recycle = 1，打开快速回收 TIME_WAIT
+    * sysctl -w net.ipv4.tcp_tw_reuse = 2，快速回收并重用 TIME_WAIT 的连接，貌似和 tw_recycle 有冲突，不能重用就回收
+    * sysctl -w net.ipv4.tcp_max_tw_buckets = 5000，处于 TIME_WAIT 状态的最多连接数
+
+### 相关说明
+
+* 主动关闭方在接收到被动关闭方的 FIN 请求后，发送成功给对方一个 ACK 后，将自己的状态由 FIN_WAIT2 修改为 TIME_WAIT，而必须等待2倍的MSL（Maximum Segment Lifetime，MSL是一个数据报在 internetwork 中能存在的时间）时间之后双方才能把状态都改为 CLOSED 以关闭连接。目前 RHEL 里保持 TIME_WAIT 状态的时间为 60 秒。
+
+* keepAlive 策略可以有效的避免进行三次握手和四次挥手的动作
+
 ## 参考
 
 [linux tcpdump抓取HTTP包的详细解释](https://blog.51cto.com/u_12295205/3153163)
