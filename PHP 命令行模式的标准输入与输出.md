@@ -73,9 +73,10 @@
 ?>
 ```
 
+读取标准输入后格式化输出
+
 ```php
 <?php
-    // 读取标准输入后格式化输出
     $students = [];
     for ($i = 1; $i < 5; $i++) {
         printf("请输入学生的姓名、年龄和学号：");
@@ -106,11 +107,11 @@
 ?>
 ```
 
+PHP 实现文件复制
+
 ```php
+#!/usr/bin/env php
 <?php
-    #!/usr/bin/env php
-    <?php
-    // PHP 实现文件复制
     if (!defined('READ_SIZE')) {
         define('READ_SIZE', 4096);
     }
@@ -122,10 +123,14 @@
     }
 
     if ($argc < 3) {
-        _error_handle("Missing Arguments.");
+        _error_handle("Missing file operand");
     }
 
-    if (($fp_read = @fopen($argv[1], 'r')) === false || ($fp_write = @fopen($argv[2], 'w')) == false) {
+    if ($argv[1] === $argv[2]) {
+        _error_handle("'{$argv[1]}' and '{$argv[2]}' are the same file.");
+    }
+
+    if (($fp_read = @fopen($argv[1], 'rb')) === false || ($fp_write = @fopen($argv[2], 'wb')) == false) {
         _error_handle("Fail to open file.");
     }
 
@@ -136,4 +141,16 @@
     fclose($fp_read);
     fclose($fp_write);
 ?>
+```
+
+效果演示
+
+```bash
+# 文件复制
+[vagrant@localhost default]$ ./copy.php 蓝莲花.ncm lanlianhua.ncm
+
+# 查看复制后的文件
+[vagrant@localhost default]$ ls -al ./蓝莲花.ncm ./lanlianhua.ncm
+-rwxrwxrwx 1 vagrant vagrant 11116126 Oct 15 14:19 ./lanlianhua.ncm
+-rwxrwxrwx 1 vagrant vagrant 11116126 Jun 16 15:59 ./蓝莲花.ncm
 ```
