@@ -70,7 +70,7 @@ Copyright (c) 1982, 2021, Oracle.  All rights reserved.
 Enter user-name: 
 ```
 
-到此我们的客户端软件就算安装成功了，下面我们重点说说它是怎么连接到 Oracle 数据库的。
+到此我们的客户端软件就算安装完成了，下面我们重点说说它是怎么连接到 Oracle 数据库的。
 
 ## 使用 sqlplus 连接 Oracle 数据库
 
