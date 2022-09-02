@@ -112,3 +112,19 @@ echo ord('A') . PHP_EOL; // 65
 // 返回数字相对应于 ASCII 所指定的单个字符
 echo chr(65) . PHP_EOL; // A
 ```
+
+### 查询指定汉字的字符编码
+
+```php
+$str = '你';
+
+// CP936 就是 GBK 编码
+$charCode = mb_detect_encoding($str, ['ASCII', 'UTF-8', 'CP936', 'GB2312', 'BIG5']);
+echo 'GBK: ' . bin2hex(mb_convert_encoding($str, 'GBK', $charCode)) . PHP_EOL; // GBK: c4e3
+echo 'GB2312: ' . bin2hex(mb_convert_encoding($str, 'GB2312', $charCode)) . PHP_EOL; // GB2312: c4e3
+echo 'BIG5: ' . bin2hex(mb_convert_encoding($str, 'BIG5', $charCode)) . PHP_EOL; // BIG5: a741
+echo 'UTF-8: ' . bin2hex(mb_convert_encoding($str, 'UTF-8', $charCode)) . PHP_EOL; // UTF-8: e4bda0
+echo 'UTF-16BE: ' . bin2hex(mb_convert_encoding($str, 'UTF-16BE', $charCode)) . PHP_EOL; // UTF-16BE: 4f60
+echo 'UTF-16LE: ' . bin2hex(mb_convert_encoding($str, 'UTF-16LE', $charCode)) . PHP_EOL; // UTF-16LE: 604f
+echo 'Unicode: ' . dechex(mb_ord(mb_convert_encoding($str, 'UTF-8', $charCode))) . PHP_EOL; // Unicode: 4f60
+```
