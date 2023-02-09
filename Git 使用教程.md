@@ -125,11 +125,13 @@ git reset --hard HEAD^
 git reset --hard HEAD^^
 # 回退到前100个版本
 git reset --hard HEAD~100
-
+# 回退到指定版本，谨慎使用，操作失误容易导致代码丢失
+git reset --hard COMMIT
+# git reset 操作失误解救方法
 # 查看回退之前的版本号
 git reflog
 # 撤销版本回退
-git reset --hard 版本号
+git reset --hard Reset之前的版本号
 
 # 撤销修改（没有 add 之前）
 git checkout -- filename
