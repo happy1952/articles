@@ -54,6 +54,9 @@
 --with-xsl \
 --with-pear
 
+# 极简安装
+./configure --prefix=/usr/local/php8.1.15 --enable-fpm --disable-opcache --with-iconv=/usr/local/libiconv --host=x86_64
+
 [root@localhost]$ make -j4
 [root@localhost]$ make install
 ```
@@ -72,7 +75,6 @@ See `config.log' for more details
 
 2. 然后在 configure 后加上 --host=x86_64，--host 后面的参数以上面命令输出为准。
 ```
-
 
 2. 配置 opcache 时未找到支持的共享内存缓存支持
 
@@ -109,4 +111,22 @@ configure: error: Package requirements (libzip >= 0.11 libzip != 1.3.1 libzip !=
 5. make && make install
 6. export PKG_CONFIG_PATH='/usr/local/libzip-1.1.2/lib/pkgconfig'
 7. 或者在 configure 时指定参数 --with-zip=/usr/local/libzip-1.1.2
+```
+
+5. iconv 模块编译报错
+
+```code
+报错信息：
+undefined reference to `libiconv_open'
+undefined reference to `libiconv_close'
+undefined reference to `libiconv'
+
+解决方案：
+wget http://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.13.1.tar.gz
+tar -zxvf libiconv-1.13.1.tar.gz
+cd libiconv-1.13.1
+./configure --prefix=/usr/local/libiconv
+make && make install
+
+./configure --prefix=/usr/local/php --with-iconv=/usr/local/libiconv
 ```
