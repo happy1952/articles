@@ -142,6 +142,12 @@ server_port = 7000
 # 与服务器端 token 保持一致
 token = token12345!
 
+# 下面这两项配置可用于启动客户端配置文件热加载（/usr/local/bin/frp reload）
+# 启用 AdminUI 监听的本地地址
+admin_addr = 127.0.0.1
+# 启用 AdminUI 监听的本地端口
+admin_port = 7400
+
 [web]
 type = http
 
