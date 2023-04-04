@@ -101,6 +101,18 @@ systemctl enable supervisord
 systemctl is-enabled supervisord 
 ```
 
+### 修改配置文件后如何重启？
+```bash
+# 查看当前进程状态
+supervisorctl status
+# 停止所有进程
+supervisorctl stop all
+# 查看 supervisord 状态
+systemctl status supervisord
+# 重启 supervisord
+systemctl restart supervisord
+```
+
 ### 参考：
 [Supervisord管理进程实践](https://thief.one/2018/06/01/1/)  
 [Python supervisor 强大的进程管理工具](https://juejin.im/entry/5cbde1335188250a7f630c2a)  
