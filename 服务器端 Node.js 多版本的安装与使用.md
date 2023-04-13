@@ -61,3 +61,4 @@ nvm run system --version
 
 ## 其他
 * [nvm 安装脚本](./source/nvm_install.zip)
+* [nvm for windows](https://github.com/coreybutler/nvm-windows)
