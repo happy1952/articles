@@ -67,12 +67,12 @@ the timeout ("config.vm.boot_timeout") value.
 
 可以看到，系统在使用 SSH 免密登录时不断的提示 Warning: Authentication failure. Retrying...，为什么会出现这种情况呢？
 
-因为 SSH 免密登录时是使用公钥、私钥进行匹配，而在我们打包 box 时，虚拟机里面的公钥是和我打包时本地环境里的私钥配对的，而在新的环境下加载 box 时，新环境下的私钥和虚拟机里面的公钥无法匹配，所以就会一直进行登录尝试。
+一般是因为 SSH 免密登录时是使用公钥、私钥进行密钥认证，而在我们在打包 box 时，虚拟机里面的私钥是和打包时本地环境里的公钥配对的，而在新的环境下加载 box 时，新环境下的公钥和虚拟机里面的私钥无法匹配，所以就会出现上面的情况，Vagrant 一直在进行登录尝试。
 
 知道了症状，那我们现在来开药方。既然是公钥、私钥不匹配，那我们改成一对就可以了，具体操作步骤如下:
 
 ```bash
-# 进入 Vagrantfile 同级目录下，执行 `vagrant ssh-config` 查看私钥所在位置。注意：虚拟机必须是启动状态 (vagrant up)
+# 进入 Vagrantfile 同级目录下，执行 `vagrant ssh-config` 查看私钥所在位置。注意：虚拟机必须是启动状态 (`vagrant up`)
 $ vagrant ssh-config
 Host default
   HostName 127.0.0.1
